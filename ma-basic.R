@@ -1,6 +1,7 @@
 # Packages
 library(meta)
 library(dmetar)
+library(dplyr)
 
 # Data
 ?DepressionMortality
@@ -17,7 +18,8 @@ ma <- metabin(event.e = event.e,
               comb.fixed = T, 
               comb.random = T,
               prediction = T, 
-              hakn = T)
+              hakn = T, #reduce false positive
+              adhoc.hakn = "iqwig6") #adjust the possible narrow ci caused by hakn
 ma
 
 # Forest plot ----
@@ -42,3 +44,57 @@ ma_inf
 
 plot(ma_inf, "baujat")
 plot(ma_inf, "influence")
+
+# Extra ----
+## metagen ----
+
+# data for metagen
+dat_metagen <- data.frame(
+  studlab = DepressionMortality$author,
+  logrr = ma2$TE,
+  se = ma2$seTE,
+  ci_lower = ma2$lower,
+  ci_upper = ma2$upper
+)
+
+# data witth NAs
+dat_metagen2 <- 
+  dat_metagen %>% 
+  mutate(se[c(3, 8)] = NA)
+
+dat_metagen$se[c(3, 8)] <- NA
+dat_metagen$ci_lower[-c(3,8)] <- NA
+dat_metagen$ci_upper[-c(3,8)] <- NA
+dat_metagen
+
+# random effect model
+ma_metagen <- metagen(TE = logrr,
+                      seTE = se,
+                      lower = ci_lower,
+                      upper = ci_upper,
+                      studlab = studlab,
+                      data = dat_metagen,
+                      sm = "RR",
+                      method.tau = "PM",
+                      comb.fixed = F,
+                      comb.random = T,
+                      prediction = T,
+                      hakn = T,
+                      adhoc.hakn = "iqwig6") 
+summary(ma_metagen)
+summary(ma2)
+
+## use metafor ----
+library(metafor)
+
+# random effect model
+ma_metafor <- rma(yi = ma2$TE,
+                  sei = ma2$seTE,
+                  measure = "RR",
+                  method = "PM",
+                  test = "knha")
+ma_metafor
+predict(ma_metafor, transf = exp, digits = 2)
+
+# GOSH analysis
+gosh(ma_metafor) #do not run!
