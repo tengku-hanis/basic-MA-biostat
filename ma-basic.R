@@ -1,7 +1,6 @@
 # Packages
 library(meta)
 library(dmetar)
-library(dplyr)
 
 # Data
 ?DepressionMortality
@@ -58,10 +57,6 @@ dat_metagen <- data.frame(
 )
 
 # data witth NAs
-dat_metagen2 <- 
-  dat_metagen %>% 
-  mutate(se[c(3, 8)] = NA)
-
 dat_metagen$se[c(3, 8)] <- NA
 dat_metagen$ci_lower[-c(3,8)] <- NA
 dat_metagen$ci_upper[-c(3,8)] <- NA
@@ -96,5 +91,6 @@ ma_metafor <- rma(yi = ma2$TE,
 ma_metafor
 predict(ma_metafor, transf = exp, digits = 2)
 
-# GOSH analysis
-gosh(ma_metafor) #do not run!
+# baujat plot from metafor
+baujat(ma_metafor)
+ma2$studlab[c(13,14)]
