@@ -1,4 +1,15 @@
-# Packages
+# Install packages
+if (!require("meta")) {
+  install.packages("meta")
+}
+if (!require("devtools")) {
+  install.packages("devtools")
+}
+if (!require("dmetar")) {
+  devtools::install_github("MathiasHarrer/dmetar", upgrade = "never")
+}
+
+# Load packages
 library(meta)
 library(dmetar)
 
@@ -58,8 +69,6 @@ dat_metagen <- data.frame(
 
 # data witth NAs
 dat_metagen$se[c(3, 8)] <- NA
-dat_metagen$ci_lower[-c(3,8)] <- NA
-dat_metagen$ci_upper[-c(3,8)] <- NA
 dat_metagen
 
 # random effect model
