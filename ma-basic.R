@@ -103,5 +103,3 @@ predict(ma_metafor, transf = exp, digits = 2)
 # baujat plot from metafor
 baujat(ma_metafor)
 ma2$studlab[c(13,14)]
-
-TESTING2
